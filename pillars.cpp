@@ -90,7 +90,8 @@ void get_p(int number_of_columns, double *possibility,int *top,int *bottom, int 
 	//here make T=P
 	
 	for (int i = 0; i < number_of_columns; i++) {
-		possibility[i] = sqrt(power_of_one_column[i]);//about v/c*r^0.5
+		possibility[i] = 1-exp(-0.3*sqrt(power_of_one_column[i]));//about v/c*r^0.5
+		//cout << possibility[i] << endl;
 		
 	
 	}
@@ -213,10 +214,10 @@ int main(int argc, char* argv[])
 	int number_of_systems= 1000;
 	parser.get("systems", number_of_systems);
 
-	int max_number_of_steps = 3000;
+	int max_number_of_steps = 100000;
 	parser.get("steps", max_number_of_steps);
 	
-	int voltage =1000;
+	int voltage =50;
 	parser.get("voltage", voltage);
 	
 	
@@ -235,7 +236,7 @@ int main(int argc, char* argv[])
 	int how_many_pillar_to_plot = 5;
 	char temp[100];
 	
-	ofstream file_for_variance("variance.txt");
+	ofstream file_for_variance("variance.csv");
 
 	for (int n = 1; n <= number_of_systems; n++) {
 		/*if (n <= how_many_pillar_to_plot&&n>1) {
@@ -261,6 +262,7 @@ int main(int argc, char* argv[])
 			if (if_failed(number_of_columns, top, bottom)) {
 				fail_times.push_back(t);
 				variance[n] = get_variance(number_of_rows,number_of_columns, top, bottom);
+				cout << "from "<<n<<" systems "<<fail_times.size() << "systems failed" << endl;
 				file_for_variance << variance[n] << endl;
 				// output files for drawing some pillars
 				if (n<= how_many_pillar_to_plot) {
@@ -291,7 +293,7 @@ int main(int argc, char* argv[])
 	}
 	
 	cout << fail_times.size() <<"systems failed"<< endl;
-	ofstream file_for_fail_time("fail_time.txt");
+	ofstream file_for_fail_time("fail_time.csv");
 	for (auto t : fail_times)
 		file_for_fail_time << t << endl;
 
