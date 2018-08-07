@@ -33,7 +33,17 @@ void initialize(int number_of_layers, int *left1, int *right1, int *left2, int *
 		left2[i] = right1[i];
 		right2[i] = right1[i]+ 2 * (i / 2)+2;
 	}
-
+	/*
+	      x x  X X X X X X     5
+		  x x  X X X X X X     4
+		x x x x  X X X X       3
+		x x x x  X X X X       2
+	  x x x x x x  X X         1
+	  x x x x x x  X X         0
+	 0 1 2 3 4 5 6  7 8
+	
+	*/
+	//for ploting the initial picture
 	if (n <1) {
 		sprintf_s(temp, "i_left1_%d.txt", n + 1);
 		ofstream file_for_left1(temp);
@@ -58,16 +68,7 @@ void initialize(int number_of_layers, int *left1, int *right1, int *left2, int *
 
 		n++;
 	}
-	/*
-	      x x  X X X X X X     5
-		  x x  X X X X X X     4
-		x x x x  X X X X       3
-		x x x x  X X X X       2
-	  x x x x x x  X X         1
-	  x x x x x x  X X         0
-	 0 1 2 3 4 5 6  7 8
 	
-	*/
 
 
 	
@@ -76,6 +77,7 @@ bool if_failed(int number_of_layers,int *left1, int *right1, int *left2, int *ri
 	int temp1 = 0 , temp2 = 0;
 	for (int i = 0; i < number_of_layers; i++) {
 		//from top to bottom
+		
 		if(right1[number_of_layers - 1 - i] - left1[number_of_layers - 1 - i] > 0&&temp1==0) {
 			temp1 = number_of_layers - 1 - i;//the first layer that is not empty
 			break;
@@ -110,6 +112,7 @@ void wear_off(int number_of_layers, int *left1, int *right1, int *left2, int *ri
 	int overlap = 0;
 	std::uniform_real_distribution<> if_remove(0, 1);
 
+	//how many layers from tooth1 are touching tooth2?
 	for (int i = 0; i < number_of_layers; i++) {
 		if (right1[i] == left2[i]) {
 			temp++;
@@ -120,7 +123,7 @@ void wear_off(int number_of_layers, int *left1, int *right1, int *left2, int *ri
 	possibility = 1-exp(-5.0 / temp);//force_on_one_layer = 1 / temp
 	//cout << possibility << endl;
 	for (int i = 0; i < number_of_layers; i++) {
-		//when the layer is not empty and 
+		//when the layer is not empty and touches tooth2
 		if (if_remove(s)<=possibility&&right1[i]!=left1[i]&&right1[i]==left2[i]) {
 			right1[i] = right1[i] - 1;
 		}
@@ -131,7 +134,7 @@ void wear_off(int number_of_layers, int *left1, int *right1, int *left2, int *ri
 	
 	for (int i = 0; i < number_of_layers; i++) {
 		
-		//if any layer of the first tooth become empty?
+		//if any layer of the first tooth become empty? If yes, place all the layers above it to -1,they broke
 		//from bottom to top
 	
 		if (right1[i] == left1[i]){
@@ -142,7 +145,7 @@ void wear_off(int number_of_layers, int *left1, int *right1, int *left2, int *ri
 				
 			}
 		}
-		//if any layer of the second tooth become empty?
+		//if any layer of the second tooth become empty?If yes, place all the layers below it to -1,they broke
 		//from top to bottom
 		if (right2[number_of_layers - 1 - i] == left2[number_of_layers - 1 - i]) {
 			for (int j = 0; j <=number_of_layers - 1 - i; j++) {
@@ -153,7 +156,7 @@ void wear_off(int number_of_layers, int *left1, int *right1, int *left2, int *ri
 		}
 	}
 	temp = 0;
-	//if there is a gap between these two teeth?
+	//if there is a gap between these two teeth (none of the layers from tooth1 touches tooth2?)?
 	for (int i = 0; i < number_of_layers; i++) {
 		if (right1[i] == left2[i]) {
 			temp++;
@@ -162,7 +165,7 @@ void wear_off(int number_of_layers, int *left1, int *right1, int *left2, int *ri
 	if (temp == 0) {//when temp=0, it fails or exists a gap
 		for (int i = 0; i < number_of_layers; i++) {
 
-			if (left1[i] != right1[i] && left2[i] != right2[i]) {
+			if (left1[i] != right1[i] && left2[i] != right2[i]) {//when the same layers from different teeth both are not empty
 				temp2 = right1[i];
 				right1[i] = left2[i];
 				left1[i] = left1[i] + left2[i] - temp2;
@@ -219,13 +222,11 @@ int main(int argc, char* argv[])
 	int *left2 = new int[number_of_layers];
 	int *right2 = new int[number_of_layers];
 
-
-
-
 	vector<int> fail_times;
 	
-	const int how_many_gears_to_plot=3;
-	ofstream file_for_variance("variance.csv");
+	int how_many_gears_to_plot=3;
+	parser.get("plots", how_many_gears_to_plot);
+	
 
 	for (int n = 1; n <= number_of_systems; n++) {
 		initialize(number_of_layers, left1, right1, left2, right2);
@@ -235,7 +236,6 @@ int main(int argc, char* argv[])
 			wear_off(number_of_layers,left1, right1, left2, right2);
 			steps++;
 		}
-		
 			fail_times.push_back(steps);
 			plot_gear(how_many_gears_to_plot,number_of_layers, left1, right1, left2, right2);// output files for drawing some gears
 	}
@@ -244,7 +244,6 @@ int main(int argc, char* argv[])
 		file_for_fail_time << t << endl;
 	
 	file_for_fail_time.close();
-	file_for_variance.close();
 	delete[]left1;
 	delete[]right1;
 	delete[]left2;
