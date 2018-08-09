@@ -79,18 +79,24 @@ bool if_failed(int number_of_layers,int *left1, int *right1, int *left2, int *ri
 		//from top to bottom
 		
 		if(right1[number_of_layers - 1 - i] - left1[number_of_layers - 1 - i] > 0&&temp1==0) {
-			temp1 = number_of_layers - 1 - i;//the first layer that is not empty
+			temp1 = number_of_layers - i;//give the the first layer that is not empty plus 1
 			break;
 		}
 	}
-		
+
+	// every layer is empty
+	if (temp1 == 0) {
+		return true;
+	
+	}
    for (int i = 0; i < number_of_layers; i++) {
 	   //from bottom to top
 			if (right2[i] - left2[i] >0&&temp2==0) {
-				temp2 = i;
+				temp2 = i+1;
 				break;
 			}
 	}
+   
    if (temp1 < temp2) {
 	   return true;
    }
@@ -210,7 +216,7 @@ int main(int argc, char* argv[])
 
 	//input parameters
 
-	int number_of_layers = 50;
+	int number_of_layers = 7;
 	parser.get("layers", number_of_layers);
 
 	int number_of_systems = 3000;
@@ -227,7 +233,7 @@ int main(int argc, char* argv[])
 	int how_many_gears_to_plot=3;
 	parser.get("plots", how_many_gears_to_plot);
 	
-
+	
 	for (int n = 1; n <= number_of_systems; n++) {
 		initialize(number_of_layers, left1, right1, left2, right2);
 		steps = 0;
@@ -235,6 +241,7 @@ int main(int argc, char* argv[])
 
 			wear_off(number_of_layers,left1, right1, left2, right2);
 			steps++;
+
 		}
 			fail_times.push_back(steps);
 			plot_gear(how_many_gears_to_plot,number_of_layers, left1, right1, left2, right2);// output files for drawing some gears
