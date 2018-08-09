@@ -298,9 +298,13 @@ int main(int argc, char* argv[])
 		file_for_fail_time << t << endl;
 
 	delete[] possibility;
-	delete [] top;
+	delete[] top;
 	delete[] bottom;
 	delete[] variance;
+	delete[]resistance_of_one_column;
+	delete[]power_of_one_column;
+	delete[]overlap;
+
 	file_for_fail_time.close();
 	file_for_variance.close();
 	
@@ -314,3 +318,15 @@ int main(int argc, char* argv[])
 
 //the resistivity of copper is 0.0175 Ohm*mm^2/m, let's assume one block is 0.0001 mm^2,0.1 mm (0.0001m) thick
 //Ohm*mm^2/m * 0.0001m / 0.0001mm^2=Ohm
+
+
+/*
+if (right1[number_of_layers - 1 - i] - left1[number_of_layers - 1 - i] <= 0 && temp1 != 0) {
+return true;//when meet a layer that is empty and there are other layers above it is not empty,the gear broke.
+}
+
+if (right2[i] - left2[i] <= 0 && temp2 != 0) {
+return true;
+}
+
+*/
