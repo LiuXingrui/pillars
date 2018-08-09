@@ -61,7 +61,7 @@ void get_overlap_beteen_two_columns(int number_of_columns, int *top, int *bottom
 	//overlap[0] and overlap[number_of_columns] are just the 
 	//number of blocks in column[0] and column[number_of_columns-1]
 	overlap[0] = clamp(top[0] - bottom[0]);
-	overlap[number_of_columns] = clamp(top[number_of_columns - 1] - bottom[number_of_columns - 1]);
+
 	}
 
 double get_resistance(int number_of_columns, int *top, int *bottom, int *overlap,double*resistance_of_one_column) {
